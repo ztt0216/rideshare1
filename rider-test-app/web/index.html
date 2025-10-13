@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>RideShare 测试面板</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.5; }
+        h1 { margin-bottom: 0; }
+        section { border: 1px solid #ccc; border-radius: 8px; padding: 16px; margin-top: 24px; }
+        label { display: block; margin-top: 8px; }
+        input, select { padding: 6px; margin-top: 4px; width: 100%; box-sizing: border-box; }
+        button { margin-top: 12px; padding: 8px 14px; cursor: pointer; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+        #log { white-space: pre-wrap; background: #f9f9f9; border: 1px solid #ddd; padding: 12px; min-height: 160px; }
+    </style>
+</head>
+<body>
+<h1>RideShare 轻量测试面板</h1>
+<p>确保先运行 <code>java -cp bin com.unimelb.rideshare.App</code> 启动后端，随后在浏览器中打开本页面（直接双击 <code>web/index.html</code> 即可）。</p>
+<p>所有操作都会调用 <code>http://localhost:8080/api/...</code> 的接口，结果会显示在底部输出区。</p>
+
+<div class="grid">
+    <section>
+        <h2>注册司机</h2>
+        <label>姓名<input id="driver-name" required></label>
+        <label>邮箱<input id="driver-email" required></label>
+        <label>车辆品牌<input id="driver-make" required></label>
+        <label>车型<input id="driver-model" required></label>
+        <label>颜色<input id="driver-colour" required></label>
+        <label>车牌号<input id="driver-registration" required></label>
+        <button onclick="registerDriver()">注册司机</button>
+    </section>
+
+    <section>
+        <h2>更新司机班次</h2>
+        <label>司机 ID<input id="availability-driver" required></label>
+        <label>星期<select id="availability-day">
+            <option value="MONDAY">MONDAY</option>
+            <option value="TUESDAY">TUESDAY</option>
+            <option value="WEDNESDAY">WEDNESDAY</option>
+            <option value="THURSDAY">THURSDAY</option>
+            <option value="FRIDAY">FRIDAY</option>
+            <option value="SATURDAY">SATURDAY</option>
+            <option value="SUNDAY">SUNDAY</option>
+        </select></label>
+        <label>开始时间 (HH:mm)<input id="availability-start" placeholder="08:00" required></label>
+        <label>结束时间 (HH:mm)<input id="availability-end" placeholder="12:00" required></label>
+        <button onclick="updateAvailability()">提交班次</button>
+    </section>
+
+    <section>
+        <h2>注册乘客</h2>
+        <label>姓名<input id="rider-name" required></label>
+        <label>邮箱<input id="rider-email" required></label>
+        <button onclick="registerRider()">注册乘客</button>
+    </section>
+
+    <section>
+        <h2>创建行程请求</h2>
+        <label>乘客 ID<input id="ride-rider" required></label>
+        <label>上车点<input id="ride-pickup" required></label>
+        <label>下车点<input id="ride-dropoff" required></label>
+        <button onclick="createRideRequest()">提交请求</button>
+    </section>
+
+    <section>
+        <h2>匹配行程</h2>
+        <label>行程请求 ID<input id="match-request" required></label>
+        <button onclick="matchRide()">匹配司机</button>
+    </section>
+
+    <section>
+        <h2>接受行程</h2>
+        <label>行程 ID<input id="accept-ride" required></label>
+        <label>司机 ID<input id="accept-driver" required></label>
+        <button onclick="acceptRide()">确认接单</button>
+    </section>
+
+    <section>
+        <h2>开始 / 完成行程</h2>
+        <label>行程 ID<input id="transition-ride" required></label>
+        <div style="display:flex; gap:8px; margin-top:12px;">
+            <button onclick="startRide()">开始行程</button>
+            <button onclick="completeRide()">完成行程</button>
+        </div>
+    </section>
+
+    <section>
+        <h2>取消行程请求</h2>
+        <label>行程请求 ID<input id="cancel-request" required></label>
+        <button onclick="cancelRequest()">取消请求</button>
+    </section>
+
+    <section>
+        <h2>查看信息</h2>
+        <button onclick="listDrivers()">司机列表</button>
+        <button onclick="listOpenRequests()">待处理请求</button>
+        <button onclick="listActiveRides()">活动行程</button>
+    </section>
+</div>
+
+<section>
+    <h2>返回结果</h2>
+    <div id="log">尚无输出。</div>
+</section>
+
+<script>
+const API_BASE = "http://localhost:8080/api";
+
+function log(message, data) {
+    const logArea = document.getElementById("log");
+    const time = new Date().toLocaleTimeString();
+    let content = `[${time}] ${message}`;
+    if (data !== undefined) {
+        content += "\n" + JSON.stringify(data, null, 2);
+    }
+    content += "\n\n" + logArea.innerText;
+    logArea.innerText = content;
+}
+
+async function postForm(path, payload) {
+    const response = await fetch(`${API_BASE}${path}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams(payload)
+    });
+    const text = await response.text();
+    const data = text ? JSON.parse(text) : {};
+    if (!response.ok) {
+        throw data;
+    }
+    return data;
+}
+
+async function getJson(path) {
+    const response = await fetch(`${API_BASE}${path}`);
+    const data = await response.json();
+    if (!response.ok) {
+        throw data;
+    }
+    return data;
+}
+
+function handleError(action, err) {
+    console.error(action, err);
+    const message = err && err.error ? err.error : (err.message || JSON.stringify(err));
+    log(`${action} 失败`, { error: message });
+}
+
+async function registerDriver() {
+    try {
+        const payload = {
+            name: document.getElementById("driver-name").value,
+            email: document.getElementById("driver-email").value,
+            make: document.getElementById("driver-make").value,
+            model: document.getElementById("driver-model").value,
+            colour: document.getElementById("driver-colour").value,
+            registration: document.getElementById("driver-registration").value
+        };
+        const result = await postForm("/drivers/register", payload);
+        log("司机已注册", result);
+    } catch (err) {
+        handleError("注册司机", err);
+    }
+}
+
+async function updateAvailability() {
+    try {
+        const result = await postForm("/drivers/availability", {
+            driverId: document.getElementById("availability-driver").value,
+            day: document.getElementById("availability-day").value,
+            start: document.getElementById("availability-start").value,
+            end: document.getElementById("availability-end").value
+        });
+        log("班次已更新", result);
+    } catch (err) {
+        handleError("更新班次", err);
+    }
+}
+
+async function registerRider() {
+    try {
+        const result = await postForm("/riders/register", {
+            name: document.getElementById("rider-name").value,
+            email: document.getElementById("rider-email").value
+        });
+        log("乘客已注册", result);
+    } catch (err) {
+        handleError("注册乘客", err);
+    }
+}
+
+async function createRideRequest() {
+    try {
+        const result = await postForm("/rides/request", {
+            riderId: document.getElementById("ride-rider").value,
+            pickup: document.getElementById("ride-pickup").value,
+            dropOff: document.getElementById("ride-dropoff").value
+        });
+        log("行程请求已创建", result);
+    } catch (err) {
+        handleError("创建行程请求", err);
+    }
+}
+
+async function matchRide() {
+    try {
+        const result = await postForm("/rides/match", {
+            rideRequestId: document.getElementById("match-request").value
+        });
+        log("行程已匹配", result);
+    } catch (err) {
+        handleError("匹配行程", err);
+    }
+}
+
+async function acceptRide() {
+    try {
+        const result = await postForm("/rides/accept", {
+            rideId: document.getElementById("accept-ride").value,
+            driverId: document.getElementById("accept-driver").value
+        });
+        log("行程已接受", result);
+    } catch (err) {
+        handleError("接受行程", err);
+    }
+}
+
+async function startRide() {
+    try {
+        const result = await postForm("/rides/start", {
+            rideId: document.getElementById("transition-ride").value
+        });
+        log("行程已开始", result);
+    } catch (err) {
+        handleError("开始行程", err);
+    }
+}
+
+async function completeRide() {
+    try {
+        const result = await postForm("/rides/complete", {
+            rideId: document.getElementById("transition-ride").value
+        });
+        log("行程已完成", result);
+    } catch (err) {
+        handleError("完成行程", err);
+    }
+}
+
+async function cancelRequest() {
+    try {
+        const result = await postForm("/rides/cancel", {
+            rideRequestId: document.getElementById("cancel-request").value
+        });
+        log("行程请求已取消", result);
+    } catch (err) {
+        handleError("取消行程请求", err);
+    }
+}
+
+async function listDrivers() {
+    try {
+        const result = await getJson("/drivers");
+        log("司机列表", result);
+    } catch (err) {
+        handleError("获取司机列表", err);
+    }
+}
+
+async function listOpenRequests() {
+    try {
+        const result = await getJson("/rides/open");
+        log("待处理请求", result);
+    } catch (err) {
+        handleError("获取待处理请求", err);
+    }
+}
+
+async function listActiveRides() {
+    try {
+        const result = await getJson("/rides/active");
+        log("活动行程", result);
+    } catch (err) {
+        handleError("获取活动行程", err);
+    }
+}
+</script>
+</body>
+</html>
