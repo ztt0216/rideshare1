@@ -23,6 +23,7 @@ com\rideshare\domain\unitofwork\DatabaseUnitOfWork.class
 com\rideshare\domain\DriverAvailability.class
 com\rideshare\service\DriverAvailabilityService$AvailabilitySchedule.class
 com\rideshare\util\UnitOfWork.class
+com\rideshare\config\DatabaseInitializerListener.class
 com\rideshare\domain\DayOfWeek.class
 com\rideshare\presentation\DriverAvailabilityController$ErrorResponse.class
 com\rideshare\domain\RideStatus.class

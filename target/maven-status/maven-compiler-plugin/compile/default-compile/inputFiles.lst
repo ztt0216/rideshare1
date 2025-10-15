@@ -30,5 +30,6 @@ D:\learning\2025sm2\SWEN90007\rideshare1\src\main\java\com\rideshare\domain\Driv
 D:\learning\2025sm2\SWEN90007\rideshare1\src\main\java\com\rideshare\domain\RideStatus.java
 D:\learning\2025sm2\SWEN90007\rideshare1\src\main\java\com\rideshare\util\RideShareException.java
 D:\learning\2025sm2\SWEN90007\rideshare1\src\main\java\com\rideshare\domain\UserRepository.java
+D:\learning\2025sm2\SWEN90007\rideshare1\src\main\java\com\rideshare\config\DatabaseInitializerListener.java
 D:\learning\2025sm2\SWEN90007\rideshare1\src\main\java\com\rideshare\datasource\RideRepositoryImpl.java
 D:\learning\2025sm2\SWEN90007\rideshare1\src\main\java\com\rideshare\config\DatabaseConfig.java
