@@ -33,10 +33,27 @@ public class DatabaseConfig {
     
     private static Connection getConnectionFromDatabaseUrl(String databaseUrl) throws SQLException {
         try {
+            // Remove postgresql:// prefix and parse
             URI dbUri = new URI(databaseUrl);
             String username = dbUri.getUserInfo().split(":")[0];
             String password = dbUri.getUserInfo().split(":")[1];
-            String jdbcUrl = "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath();
+            
+            // Get port, use default PostgreSQL port 5432 if not specified
+            int port = dbUri.getPort();
+            if (port == -1) {
+                port = 5432;
+            }
+            
+            // Get path and remove leading slash
+            String database = dbUri.getPath();
+            if (database.startsWith("/")) {
+                database = database.substring(1);
+            }
+            
+            // Build JDBC URL with SSL parameters for Render
+            String jdbcUrl = "jdbc:postgresql://" + dbUri.getHost() + ":" + port + "/" + database + "?sslmode=require";
+            
+            System.out.println("Connecting to database: " + dbUri.getHost() + ":" + port + "/" + database);
             
             return DriverManager.getConnection(jdbcUrl, username, password);
         } catch (URISyntaxException e) {
