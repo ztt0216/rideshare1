@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: rideshare-backend
+    runtime: java
+    plan: free
+    buildCommand: mvn clean package
+    startCommand: java $JAVA_OPTS -jar target/dependency/webapp-runner.jar --port $PORT target/rideshare1.war
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: JAVA_OPTS
+        value: -Xmx512m -Xms256m
