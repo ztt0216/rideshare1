@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RideShare API Test</title>
+    <script>
+        async function register() {
+            const data = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+                role: document.getElementById('role').value
+            };
+
+            try {
+                const response = await fetch('/api/users', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                document.getElementById('result').textContent = JSON.stringify(result, null, 2);
+            } catch (error) {
+                document.getElementById('result').textContent = error.message;
+            }
+        }
+
+        async function login() {
+            const data = {
+                email: document.getElementById('loginEmail').value,
+                password: document.getElementById('loginPassword').value
+            };
+
+            try {
+                const response = await fetch('/api/users/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                document.getElementById('result').textContent = JSON.stringify(result, null, 2);
+            } catch (error) {
+                document.getElementById('result').textContent = error.message;
+            }
+        }
+    </script>
+</head>
+<body>
+    <h2>Register</h2>
+    <div>
+        <input type="text" id="name" placeholder="Name" /><br/>
+        <input type="email" id="email" placeholder="Email" /><br/>
+        <input type="password" id="password" placeholder="Password" /><br/>
+        <select id="role">
+            <option value="RIDER">Rider</option>
+            <option value="DRIVER">Driver</option>
+        </select><br/>
+        <button onclick="register()">Register</button>
+    </div>
+
+    <h2>Login</h2>
+    <div>
+        <input type="email" id="loginEmail" placeholder="Email" /><br/>
+        <input type="password" id="loginPassword" placeholder="Password" /><br/>
+        <button onclick="login()">Login</button>
+    </div>
+
+    <h2>Result:</h2>
+    <pre id="result"></pre>
+</body>
+</html>
