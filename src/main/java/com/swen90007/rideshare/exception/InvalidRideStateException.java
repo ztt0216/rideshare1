@@ -1,1 +1,0 @@
-package com.swen90007.rideshare.exception; public class InvalidRideStateException extends DomainException { public InvalidRideStateException(String m){super(m);} }
