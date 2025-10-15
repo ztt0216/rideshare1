@@ -1,0 +1,1 @@
+package com.swen90007.rideshare.exception; public class NotFoundException extends DomainException { public NotFoundException(String m){super(m);} }

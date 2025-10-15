@@ -1,0 +1,1 @@
+package com.swen90007.rideshare.exception; public class ConcurrencyConflictException extends DomainException { public ConcurrencyConflictException(String m){super(m);} }

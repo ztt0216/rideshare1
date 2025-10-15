@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
+                             https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"
+         version="5.0">
+
+  <display-name>RideShare Part3 (Service Layer)</display-name>
+
+  <!-- Controllers (delegating to Service layer internally) -->
+  <servlet>
+    <servlet-name>AuthController</servlet-name>
+    <servlet-class>com.swen90007.rideshare.controller.AuthController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AuthController</servlet-name>
+    <url-pattern>/api/auth/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>AvailabilityController</servlet-name>
+    <servlet-class>com.swen90007.rideshare.controller.AvailabilityController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AvailabilityController</servlet-name>
+    <url-pattern>/api/availability/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>RideRiderController</servlet-name>
+    <servlet-class>com.swen90007.rideshare.controller.RideRiderController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>RideRiderController</servlet-name>
+    <url-pattern>/api/rider/ride/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>RideDriverController</servlet-name>
+    <servlet-class>com.swen90007.rideshare.controller.RideDriverController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>RideDriverController</servlet-name>
+    <url-pattern>/api/driver/ride/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>WalletController</servlet-name>
+    <servlet-class>com.swen90007.rideshare.controller.WalletController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>WalletController</servlet-name>
+    <url-pattern>/api/wallet/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>HistoryController</servlet-name>
+    <servlet-class>com.swen90007.rideshare.controller.HistoryController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>HistoryController</servlet-name>
+    <url-pattern>/api/history/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>HealthController</servlet-name>
+    <servlet-class>com.swen90007.rideshare.controller.HealthController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>HealthController</servlet-name>
+    <url-pattern>/api/health</url-pattern>
+  </servlet-mapping>
+
+  <!-- Global CORS filter -->
+  <filter>
+    <filter-name>CorsFilter</filter-name>
+    <filter-class>com.swen90007.rideshare.controller.CorsFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>CorsFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+</web-app>

@@ -1,0 +1,1 @@
+package com.swen90007.rideshare.exception; public class UnauthorizedException extends DomainException { public UnauthorizedException(String m){super(m);} }
