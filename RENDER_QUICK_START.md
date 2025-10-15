@@ -40,17 +40,14 @@ Fill in these exact values:
 - **Region**: `Oregon (US West)` (same as your database)
 - **Branch**: `main`
 - **Root Directory**: *(leave empty)*
-- **Runtime**: `Java`
+- **Environment**: Select **"Docker"**
 
 ### Build Configuration
-- **Build Command**: 
-  ```
-  mvn clean package
-  ```
-- **Start Command**: 
-  ```
-  java $JAVA_OPTS -jar target/dependency/webapp-runner.jar --port $PORT target/rideshare1.war
-  ```
+Docker will automatically detect the `Dockerfile` in your repository.
+- **Docker Build Context Directory**: *(leave empty or `.`)*
+- **Dockerfile Path**: `Dockerfile` (should auto-detect)
+
+No need to specify build or start commands - they're in the Dockerfile!
 
 ### Instance Type
 - Select: **Free** (for testing)
@@ -59,15 +56,13 @@ Fill in these exact values:
 
 Click **"Advanced"** → **"Add Environment Variable"**
 
-Add these two variables:
+Add this variable:
 
-**Variable 1:**
+**Variable:**
 - **Key**: `DATABASE_URL`
 - **Value**: `postgresql://rideshare1_user:hqhmQ01YswRr4Z1Oyk7A0cha44DkT9cC@dpg-d3ne6rjipnbc73b1a8a0-a.oregon-postgres.render.com/rideshare1`
 
-**Variable 2:**
-- **Key**: `JAVA_OPTS`
-- **Value**: `-Xmx512m -Xms256m`
+Note: `JAVA_OPTS` and `PORT` are automatically handled by the Dockerfile.
 
 ## Step 6: Deploy!
 
